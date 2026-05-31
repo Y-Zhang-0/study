@@ -27,3 +27,4 @@ raw = [{"title": "三国演义", "price": 59.9, "authors": ["罗贯中"], "ratin
 books = parse_books(raw)
 print(books)
 
+# f"{ <表达式> [:[<填充>][<对齐>][<宽度>][,][.<精度>][<类型>] ] }"
