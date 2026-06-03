@@ -1,9 +1,8 @@
-from unittest import result
 import pytest
-import D4
 from pydantic import ValidationError
 import asyncio
 from unittest.mock import Mock, AsyncMock
+from fetcher import client
 
 @pytest.mark.parametrize(
     "items, size, expected",
@@ -16,7 +15,7 @@ from unittest.mock import Mock, AsyncMock
     ],
 )
 def test_batch_iter(items, size, expected):
-    assert list(D4.batch_iter(items, size)) == expected
+    assert list(client.batch_iter(items, size)) == expected
 
 @pytest.fixture
 def post_data():
@@ -25,7 +24,7 @@ def post_data():
     print("\n[teardown] 测试结束,清理")
 
 def test_post_model(post_data):
-    post = D4.Post(**post_data)
+    post = client.Post(**post_data)
     assert post.user_id ==1
     assert post.title == "测试标题"
 
@@ -33,7 +32,7 @@ def test_post_model(post_data):
 def test_post_invalid_user_id(post_data):
     post_data["userId"] = 0
     with pytest.raises(ValidationError):
-        D4.Post(**post_data)
+        client.Post(**post_data)
 
 
 @pytest.mark.asyncio
@@ -52,7 +51,7 @@ async def test_fetch_with_fake_client(post_data):
     fake_client.get.return_value = fake_resp
 
     # ③ 假客户端直接传进去 —— 不碰任何真实网络
-    result = await D4.fetch(fake_client, "/posts/1")
+    result = await client.fetch(fake_client, "/posts/1")
 
     # ④ 验证返回值 + 取证:它确实用正确的参数调过 get
     assert result == post_data
@@ -61,27 +60,27 @@ async def test_fetch_with_fake_client(post_data):
 
 @pytest.mark.asyncio
 async def test_fetch_posts(mocker, post_data):       # mocker 是 pytest-mock 给的 fixture
-    # 手术:把 D4 命名空间里的 "fetch" 换成假货
-    fake_fetch = mocker.patch("D4.fetch")
+    # 手术:把 fetcher.client 命名空间里的 "fetch" 换成假货
+    fake_fetch = mocker.patch("fetcher.client.fetch")
     fake_fetch.return_value = post_data               # 剧本:每次被调都返回这条数据
 
-    result = await D4.fetch_posts([1, 2, 3])
+    result = await client.fetch_posts([1, 2, 3])
 
     assert len(result) == 3                           # 3 个 id → 3 个 Post
-    assert all(isinstance(p, D4.Post) for p in result)
+    assert all(isinstance(p, client.Post) for p in result)
     assert fake_fetch.call_count == 3                 # 取证:fetch 被调了 3 次
 
 @pytest.mark.asyncio
 async def test_fetch_posts_error_isolation(mocker, post_data):
-    fake_fetch = mocker.patch("D4.fetch")
+    fake_fetch = mocker.patch("fetcher.client.fetch")
     post_data_1 = post_data
     post_data_3 = post_data.copy()
     post_data_3["userId"] = 2
     fake_fetch.side_effect = [post_data_1, Exception("测试失败"), post_data_3]
 
-    result = await D4.fetch_posts([1,2,3])
+    result = await client.fetch_posts([1,2,3])
 
     assert len(result) == 2
-    assert all(isinstance(p, D4.Post) for p in result)
+    assert all(isinstance(p, client.Post) for p in result)
     assert fake_fetch.call_count == 3 
 

@@ -1,0 +1,40 @@
+# ====== 这个项目是谁(对照 package.json 的 name/version/engines) ======
+[project]
+name = "fetcher"
+version = "0.1.0"
+description = "测试项目"
+requires-python = ">=3.12"
+
+# ====== 直接依赖(对照 dependencies)——只写"我要的",不写"捎带的" ======
+dependencies = [
+    "httpx>=0.27",
+    "pydantic>=2.0"
+]
+
+# ====== 开发依赖(对照 devDependencies)——跑测试/检查用,上线不需要 ======
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-mock",
+    "ruff",
+]
+
+# ====== 怎么把我打包安装(对照无……Node 不需要这层,后面讲为什么) ======
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ====== 各工具的配置(对照 .eslintrc/.prettierrc/jest.config,全收编进来) ======
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+
+
+
