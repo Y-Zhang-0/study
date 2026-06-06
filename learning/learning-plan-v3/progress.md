@@ -13,6 +13,7 @@
 | 2026-06-01 | D3 | 生成器 + 上下文管理器 + httpx | ai-study/phase1/D3.py | 🟡收口(代码 🟢:批改后连环雷全部自主修复,实跑达标 8 成功/3 失败隔离、真实并发计时;口头 2🟡:gather 保序、同步 with 包 await 均未掌握;"同步/异步"术语混用 ×2) | 见薄弱点清单 |
 | 2026-06-02 | D4 | pytest 深入(fixtures/parametrize/mock) | ai-study/phase1/D4.py + test/test_d4.py(11 用例) | 🟡收口(代码 🟢:11 测试全绿、parametrize/fixture/raises/asyncio/mock 五件武器全用上、4 轮返工全自主修复、实跑无网络依赖;口头 2🟢2🟡1🔴:fixture/raises 透彻,patch 路径表述、side_effect 抛/捕方向、import 副作用待补)。教学方式当日调整为"示范→照做→改造"分步带写,效果显著 | 见薄弱点清单 |
 | 2026-06-03 | D5 | 包管理(pyproject/venv/uv)+ 项目结构 | ai-study/phase1/fetcher/(uv+src 布局工程:pyproject + src/fetcher/{client,__init__} + tests/test_client.py;D4 代码与 11 测试迁入) | 🟡收口(**实跑 🟢**:11 测试全绿 + ruff clean;venv/pyproject/src 布局/`-e` 可编辑安装/`__all__` 全部亲手跑通、依赖隔离已验;**口头 2🟢2🔴**:patch 路径✅、锁文件分工✅,但 import 机制、src 布局动机两个"为什么"说不清)。当日大半时间耗在环境排障(uv 装不上→清华镜像、Anaconda 全局仓库不可写、注册表 PATH 误改后回退、stdlib 误当依赖、hatchling 包名不匹配),坑虽多但全是真知识 | 见薄弱点清单 |
+| 2026-06-04 | D6 | 实战:异步 CLI 工具(Click + asyncio) | ai-study/phase1/fetcher/src/fetcher/cli.py(fetch + batch 两子命令 + hello;Click group/option/argument + asyncio.run 整合 + ClickException + progressbar 内部 with + secho 彩色 + IntRange 校验) | 🟢收口(实跑🟢:ruff clean + fetch/batch 达标、失败隔离、分批限流、IntRange 防呆;口头🟢:晨考翻盘三硬骨头[GenericAlias/主语层级/双🔴]+ 收尾 3🟢;加餐进度条/彩色/校验全落地)。臣两处教学失误当场纠正(await↔for-in-progressbar 因果讲反、bar 传参绕弯) | 见薄弱点清单 |
 
 ## 薄弱点滚动清单
 
@@ -20,10 +21,10 @@
 
 - **D1 概念**(2026-05-31/D2 隔日重考):① `X | None` 必填语义 → ✅ 重考过(Buffer 日 D7 再确认即划掉)② `...` vs `gt/ge`,含 `Field(0, ...)` 第一个位置参数即 default → ✅ 重考过(Buffer 日确认)
 - **概念辨析(滚动)**:闭包 vs 可变默认参数陷阱 —— D3 晨考(2026-06-01):**辨析 ✅ 大进步**(两者正确区分,B"def 时求值一次、所有调用共用同一对象"答对),但闭包底层机制(cell 对象 / `__closure__`)仍答不出("具体的不清楚")→ 🟡 半过,**D4 只重考 cell/`__closure__` 机制** —— D4 晨考(2026-06-02):✅ 过(变量存 cell、挂 `__closure__`、外层函数销毁后仍可访问,全对;差一细节:`__closure__` 是 cell **元组**)→ Buffer 日 D7 确认即划掉
-- **D2 概念**:① `enumerate[raws]` 下标不报错原因 —— D3 晨考 🟡:方向对(知道方括号是注解语法)但机制错——答"程序编译不看这些",**实际是运行时真求值**:调 `__class_getitem__` 返回 `GenericAlias` 对象(证据:`list[print('x')]` 会真的打印),且 GenericAlias 可调用故易蒙混 → 未过,D4 再考 —— D4 晨考 🟡:"运行时求值"概念已扶正,但方法名 `__class_getitem__` 与类名 `GenericAlias` 均没记住(答"GenerateAlias")→ D5 只考两个名字 —— D5 晨考 🟡:方法名对(class+getitem),类名**第三次拼错**("GenerizeAlias");已挂语义锚点 **Generic=泛型、Alias=别名 → "泛型别名"** → D6 最后一次只考类名 ② `asyncio.run` 嵌套 —— D3 晨考 🔴:误答"会新开一个事件循环互不干扰",**实际抛 `RuntimeError: asyncio.run() cannot be called from a running event loop`**(实跑验证)→ 未过,D4 重考(关系 Jupyter/FastAPI 场景,必须掌握)—— D4 晨考 🟡:已知会报错(进步),但说不出原因 → D5 重考"为什么":事件循环是占住线程的死循环,一条线程同一时刻只能跑一个,`asyncio.run` 入口 `get_running_loop()` 检测到已有循环即抛错 —— D5 晨考 ✅ 过(一线程一循环 + 入口检查 + 死循环本质,全对)→ Buffer 日确认
+- **D2 概念**:① `enumerate[raws]` 下标不报错原因 —— D3 晨考 🟡:方向对(知道方括号是注解语法)但机制错——答"程序编译不看这些",**实际是运行时真求值**:调 `__class_getitem__` 返回 `GenericAlias` 对象(证据:`list[print('x')]` 会真的打印),且 GenericAlias 可调用故易蒙混 → 未过,D4 再考 —— D4 晨考 🟡:"运行时求值"概念已扶正,但方法名 `__class_getitem__` 与类名 `GenericAlias` 均没记住(答"GenerateAlias")→ D5 只考两个名字 —— D5 晨考 🟡:方法名对(class+getitem),类名**第三次拼错**("GenerizeAlias");已挂语义锚点 **Generic=泛型、Alias=别名 → "泛型别名"** → D6 最后一次只考类名 —— D6 晨考(2026-06-04)✅ **过(GenericAlias 拼对,四战首胜)**→ 划掉 ② `asyncio.run` 嵌套 —— D3 晨考 🔴:误答"会新开一个事件循环互不干扰",**实际抛 `RuntimeError: asyncio.run() cannot be called from a running event loop`**(实跑验证)→ 未过,D4 重考(关系 Jupyter/FastAPI 场景,必须掌握)—— D4 晨考 🟡:已知会报错(进步),但说不出原因 → D5 重考"为什么":事件循环是占住线程的死循环,一条线程同一时刻只能跑一个,`asyncio.run` 入口 `get_running_loop()` 检测到已有循环即抛错 —— D5 晨考 ✅ 过(一线程一循环 + 入口检查 + 死循环本质,全对)→ Buffer 日确认
 - **D2 默写**(D3 晨考):`async_time` 三验点(`functools.wraps` / `async def wrapper` / `await func()`)全对 🟢,但**漏了计时主体**(start/end/print)——名为计时器却没计时,默写要默全 → 🟡 —— D4 晨考 🟡:计时主体已补全(四要素齐),但**装饰器本体误写成 `async def`**——实跑:被装饰函数变 coroutine 对象,调用即 `TypeError: 'coroutine' object is not callable` → D5 第三次默写,新增考点:装饰器本体必须普通 `def`(装饰发生在定义时、是同步动作),只有 wrapper 是 `async def` —— D5 第三次默写 ✅ **三战首胜**:五要素全对(本体普通 `def` 已纠正),print 措辞与原版自然变体(证真默写);口述补答 ✅(装饰=同步的对象操作,不涉 I/O;后果半句由臣补全:本体 async def 则返回 coroutine 对象而非 wrapper)→ Buffer 日 D7 确认即划掉
-- **D3 概念**(收尾考核 2026-06-01):① **`asyncio.gather` 保序**——返回顺序 = 传入顺序,与完成顺序无关(实验:完成序 3,2,1 → 返回序 1,2,3);主公误归因于"惰性加载" → 🟡 D4 重考 —— D4 晨考 ✅ 过(返回序=传入序答对,"先占位、完成后填入对应位置"机制直觉正确)→ Buffer 日确认 ② **同步 `with` 可以包住含 `await` 的代码块**(实验:`with timer():` 包 `await sleep(2)` 计时 2.00s 准确);`async with` 仅当 CM **自身进出门**需要 await(如 AsyncClient 建/关连接池);主公答"不能" → 🔴 D4 重考 —— D4 晨考 🟡:核心结论翻正(能包+计时准+enter/exit 机制对),但附带说"变成了顺序执行"——实跑证伪:with 块挂起 2s 期间后台任务照常并发 3 次心跳 → 并入③术语项跟踪 ③ **同步 vs 异步术语**:同步 = 阻塞线程;异步 = 挂起协程让位事件循环;**顺序执行 ≠ 同步**——当日混用两次 → D4 重考 —— D4 晨考 🟡:框架对(阻塞 vs 让出 + 顺序≠同步均答对),但**主语错位**:答"CPU 会阻塞"——阻塞的是线程不是 CPU(CPU 被 OS 调走干别的);让出执行权的是协程,接手调度的是事件循环 → D5 重考主语层级(CPU/线程/协程/事件循环)—— D5 晨考 🔴 **三连败**:四主语错三个(阻塞答"事件循环"、调度答"线程"、CPU 答"切换协程");已重讲四层模型(CPU=机床/线程=班次/事件循环=班组长/协程=工序卡;每层只被上一层调度,隔层互不认识)+ 口诀"**OS 管线程,循环管协程,CPU 谁也不管只认指令**" → D6 必重考,四空全对才过
-- **D4 概念**(收尾考核 2026-06-02):① **patch 路径表述** 🟡——能正确使用 `mocker.patch("D4.fetch")` 但说不清机制:改的是 **D4 模块命名空间里 "fetch" 名字的指向**,口诀"patch 它被【使用】的地方"未内化 → D5 重考一句话 —— D5 晨考 🟡:"D4 内部的 fetch"方向对,但说成"调用"而非**名字的指向**,口诀没记住 → D6 重考 ② **side_effect 异常方向** 🟡——答"捕获到异常",实际是那次调用【抛出】异常,接住它的是被测代码里的 `gather(return_exceptions=True)`(mock 负责抛,你的代码负责接)→ D5 重考 —— D5 晨考 ✅ 过(mock 抛、被测代码接,方向扭正)→ Buffer 日确认 ③ **模块顶层代码 / import 副作用** 🔴——答"事件循环冲突",实际机制是 **import 即执行**:`import D4` 瞬间顶层代码全跑(真打网络);`if __name__ == "__main__"` 原理:被 import 时 `__name__` 是模块名而非 `"__main__"` → D5 重考 —— D5 晨考 🟡:"import 即执行"已扶正(原🔴),但 `__name__` 原理没说出(直接运行时值为 `"__main__"`、被 import 时值为模块名,普通 if + 值会变的变量)→ D6 只考这两个值
+- **D3 概念**(收尾考核 2026-06-01):① **`asyncio.gather` 保序**——返回顺序 = 传入顺序,与完成顺序无关(实验:完成序 3,2,1 → 返回序 1,2,3);主公误归因于"惰性加载" → 🟡 D4 重考 —— D4 晨考 ✅ 过(返回序=传入序答对,"先占位、完成后填入对应位置"机制直觉正确)→ Buffer 日确认 ② **同步 `with` 可以包住含 `await` 的代码块**(实验:`with timer():` 包 `await sleep(2)` 计时 2.00s 准确);`async with` 仅当 CM **自身进出门**需要 await(如 AsyncClient 建/关连接池);主公答"不能" → 🔴 D4 重考 —— D4 晨考 🟡:核心结论翻正(能包+计时准+enter/exit 机制对),但附带说"变成了顺序执行"——实跑证伪:with 块挂起 2s 期间后台任务照常并发 3 次心跳 → 并入③术语项跟踪 ③ **同步 vs 异步术语**:同步 = 阻塞线程;异步 = 挂起协程让位事件循环;**顺序执行 ≠ 同步**——当日混用两次 → D4 重考 —— D4 晨考 🟡:框架对(阻塞 vs 让出 + 顺序≠同步均答对),但**主语错位**:答"CPU 会阻塞"——阻塞的是线程不是 CPU(CPU 被 OS 调走干别的);让出执行权的是协程,接手调度的是事件循环 → D5 重考主语层级(CPU/线程/协程/事件循环)—— D5 晨考 🔴 **三连败**:四主语错三个(阻塞答"事件循环"、调度答"线程"、CPU 答"切换协程");已重讲四层模型(CPU=机床/线程=班次/事件循环=班组长/协程=工序卡;每层只被上一层调度,隔层互不认识)+ 口诀"**OS 管线程,循环管协程,CPU 谁也不管只认指令**" → D6 必重考,四空全对才过 —— D6 晨考 ✅ **四空全对**(线程/协程/事件循环/CPU 不归这套管),三连败翻盘 → 划掉
+- **D4 概念**(收尾考核 2026-06-02):① **patch 路径表述** 🟡——能正确使用 `mocker.patch("D4.fetch")` 但说不清机制:改的是 **D4 模块命名空间里 "fetch" 名字的指向**,口诀"patch 它被【使用】的地方"未内化 → D5 重考一句话 —— D5 晨考 🟡:"D4 内部的 fetch"方向对,但说成"调用"而非**名字的指向**,口诀没记住 → D6 重考 —— D6 晨考 🟢 方向全对,强化口诀「patch 它被【使用】的地方,不是被【定义】的地方」→ Buffer 日连续确认即划 ② **side_effect 异常方向** 🟡——答"捕获到异常",实际是那次调用【抛出】异常,接住它的是被测代码里的 `gather(return_exceptions=True)`(mock 负责抛,你的代码负责接)→ D5 重考 —— D5 晨考 ✅ 过(mock 抛、被测代码接,方向扭正)→ Buffer 日确认 ③ **模块顶层代码 / import 副作用** 🔴——答"事件循环冲突",实际机制是 **import 即执行**:`import D4` 瞬间顶层代码全跑(真打网络);`if __name__ == "__main__"` 原理:被 import 时 `__name__` 是模块名而非 `"__main__"` → D5 重考 —— D5 晨考 🟡:"import 即执行"已扶正(原🔴),但 `__name__` 原理没说出(直接运行时值为 `"__main__"`、被 import 时值为模块名,普通 if + 值会变的变量)→ D6 只考这两个值 —— D6 晨考 🟡 直接运行=`__main__` ✅;被 import 时误答"import 时写的名字"(危险——实为**模块自身的完整限定名**如 `fetcher.client`,与 import 别名无关)→ D6 收尾补这一问 —— D6 收尾 ✅ "模块完整限定名"答准 → 划掉
 - **D4 过程踩坑**(已就地纠正,记录备查):① dict 点号访问(JS 习惯):`post_data.userId` ✗ → `post_data["userId"]` ✓,Python 的 dict 键≠属性 ② **引用 vs 复制**:`a = b` 不复制对象、只是起别名,真复制需 `.copy()`;与"可变默认参数陷阱"同根(多名字共享同一可变对象)→ D5 晨考 —— D5 晨考 ✅ 过(同一地址 vs 新对象 + 共同根源全对;默写 B' 的 `[Exception(...)] * 3` 恰是引用复制活例:3 个槽位指向同一实例)→ Buffer 日确认 ③ Java 术语惯性:"注解" → Python 应说"装饰器"
 - **学习模式(meta,长期滚动)**:**"万能答案"倾向**——D1-D2 拿"闭包"解释一切,D3 拿"惰性加载"解释一切(连用 3 次,2 次错误归因)。对策:答"为什么"前先自问"这个概念回答的是哪类问题"(惰性只回答"何时执行",不回答"顺序保证"/"能否嵌套")—— D4 晨考:零乱归因(gather 占位机制直觉正确,不会的直接说"需要你解释"),倾向收敛中 —— D4 收尾 Q5 复发:拿当天刚学的"事件循环冲突"解释 import 副作用问题 → 继续滚动,对策同前
 - **代码规范(长期滚动)**:标识符拼写(D1 `parase`、D2 `prase`/`wapper`)—— **D3 全天零拼写错误 ✅**(默写+作业+三轮返工)—— D4:标识符零错误,但字符串里出现 `[steup]`(指出后已改),继续观察至 Buffer 日
@@ -79,6 +80,35 @@
 4. 被 import 时 `__name__` 的值是什么?直接运行时是什么?(D5 遗留)
 5. **import fetcher 怎么被 Python 找到**:sys.path 是什么?`-e` 可编辑安装往里塞了什么(.pth 指针)?(D5 收尾🔴)
 6. **为什么用 src 布局**:藏代码逼你测"安装后状态";平铺布局的隐患是什么?(D5 收尾🔴)
+
+### D6 晨考结果(2026-06-04):口答 5🟢2🟡 + 默写 🟡
+
+| # | 考点 | 评级 | 去向 |
+|:--|:--|:--|:--|
+| 1 | `GenericAlias` 类名 | 🟢 四战首胜,拼对 | 划掉 |
+| 2 | 同步/异步主语层级四连问 | 🟢 四空全对(线程/协程/事件循环/CPU 不归这套管),三连败翻盘 | 划掉 |
+| 3 | patch 路径 + 与 import 别名无关 | 🟢 方向全对,强化口诀「patch 它被【使用】的地方」 | Buffer 日连续确认即划 |
+| 4 | `__name__` 两个值 | 🟡 直接运行=`__main__`✅;被 import 值误答"import 时写的名字"(实为模块完整限定名,与别名无关) | D6 收尾补被 import 时的值 |
+| 5 | import 怎么被找到(sys.path + `-e` .pth) | 🟢 D5 收尾🔴翻盘(校正:进 sys.path 的是路径,非 .pth 文件本身) | 划掉 |
+| 6 | 为什么 src 布局(假绿测试) | 🟢 D5 收尾🔴翻盘,"假绿"命中 | 划掉 |
+| 默 | pyproject 最小骨架默写 | 🟡 结构全对;`dependencies` 约束语法错 | D7 补默一行 `dependencies` |
+
+**D6 晨考过程踩坑(备查)**:默写 `dependencies = ["httpx" >= 0.27, "pydantic" >= 2.0]` 三重错——① TOML 数组元素须是合法值,不认表达式;② 约束须整条放进一个 PEP 508 字符串;③ 版本号不能裸写成浮点。正确:`["httpx>=0.27", "pydantic>=2.0"]`。
+
+### D6 收尾考核结果(2026-06-04):实跑 🟢 + 口头 3🟢 → 🟢 收口
+
+| # | 考点 | 评级 | 去向 |
+|:--|:--|:--|:--|
+| 实跑 | ruff clean + batch 内部 with 进度条 + 分批限流 + IntRange 防呆 | 🟢 | 工程达标 |
+| Q1 | 被 import 时 `__name__` 值 | 🟢 模块完整限定名(晨考🟡补上) | 划掉 |
+| Q2 | 同步 with vs async with 判断标准 | 🟢 看 CM 进出门是否需 `__aenter__`/`__aexit__`(D3 滚动薄弱点焊死) | 划掉 |
+| Q3 | 一个 asyncio.run 够用 | 🟢 一线程一循环+事件循环本质+包最外层(正面理由"分批循环整个在协程内、run 一次驱动全程"由臣补全) | 划掉 |
+
+**D6 加餐(主公选 A)**:进度条(`click.progressbar` length+update 模式、内部同步 with 包 await 循环)、彩色(`secho` fg=green)、校验前移(`IntRange(1,50)`)全部落地实跑通过。主公自主提出"进度条 with 内置于 fetch_in_batch"的内聚写法,优于臣初版的 bar 传参方案。
+
+**D6 体验小坑(备查)**:进度条 label 中文"抓取中"在 Windows GBK 控制台显示乱码(`ץȡ��`)——终端编码(cp936 vs UTF-8)问题,非代码 bug;规避:label 改英文 或 终端设 UTF-8(`chcp 65001`/`PYTHONUTF8=1`)。
+
+**D6 教学复盘(臣自省)**:两处表述失误当场实测纠正——① "await 导致不能用 for-in-progressbar"因果讲反(最小实验证伪:`for ... in progressbar` 配 await 能跑);② progressbar 用 bar 传参的绕弯写法,主公提出内部 with 更优。教训:涉及"因为 A 所以不能 B"的强因果断言,先验再讲。
 
 ## 每周复盘存档
 

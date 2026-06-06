@@ -8,8 +8,13 @@ requires-python = ">=3.12"
 # ====== 直接依赖(对照 dependencies)——只写"我要的",不写"捎带的" ======
 dependencies = [
     "httpx>=0.27",
-    "pydantic>=2.0"
+    "pydantic>=2.0",
+    "click>=8.1"
 ]
+
+# ====== 告诉系统"敲 fetcher 时执行哪个函数" 命令行入口 格式:命令名 = "模块路径:函数名"======
+[project.scripts]
+fetcher = "fetcher.cli:cli"
 
 # ====== 开发依赖(对照 devDependencies)——跑测试/检查用,上线不需要 ======
 [project.optional-dependencies]
