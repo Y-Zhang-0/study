@@ -3,6 +3,7 @@ from pydantic import ValidationError
 import asyncio
 from unittest.mock import Mock, AsyncMock
 from fetcher import client
+import httpx
 
 @pytest.mark.parametrize(
     "items, size, expected",
@@ -84,3 +85,89 @@ async def test_fetch_posts_error_isolation(mocker, post_data):
     assert all(isinstance(p, client.Post) for p in result)
     assert fake_fetch.call_count == 3 
 
+@pytest.mark.asyncio
+async def test_fetch_retries_then_success(post_data):
+    fake_resp = Mock()
+    fake_resp.json.return_value = post_data
+
+    fake_client = AsyncMock()
+    fake_client.get.side_effect = [
+        httpx.ConnectTimeout("timeout 1"),
+        httpx.ConnectTimeout("timeout 2"),
+        fake_resp,
+    ]
+
+    result = await client.fetch(fake_client, "/posts/1", retry=3, backoff_factor=0)
+
+    assert result == post_data
+    assert fake_client.get.await_count == 3
+
+@pytest.mark.asyncio
+async def test_fetch_retries_exhausted():
+    fake_client = AsyncMock()
+    fake_client.get.side_effect = [
+        httpx.ConnectTimeout("timeout 1"),
+        httpx.ConnectTimeout("timeout 2"),
+        httpx.ConnectTimeout("timeout 3"),
+    ]
+
+    with pytest.raises(Exception, match="Request failed after 3 retries"):
+        await client.fetch(fake_client, "/posts/1", retry=3, backoff_factor=0)
+
+    assert fake_client.get.await_count == 3
+
+@pytest.mark.asyncio
+async def test_fetch_posts_limits_concurrency(mocker, post_data):
+    active = 0
+    max_active = 0
+
+    async def fake_fetch(client_arg, path):
+        nonlocal active, max_active
+
+        active += 1
+        max_active = max(max_active, active)
+
+        await asyncio.sleep(0.01)
+
+        active -= 1
+        return post_data
+
+    mocker.patch("fetcher.client.fetch", side_effect=fake_fetch)
+
+    result = await client.fetch_posts([1, 2, 3, 4, 5], concurrency=2)
+
+    assert len(result) == 5
+    assert max_active <= 2
+
+@pytest.mark.asyncio
+async def test_fetch_posts_concurrency_one_runs_sequentially(mocker, post_data):
+    active = 0
+    max_active = 0
+
+    async def fake_fetch(client_arg, path):
+        nonlocal active, max_active
+
+        active += 1
+        max_active = max(max_active, active)
+
+        await asyncio.sleep(0.01)
+
+        active -= 1
+        return post_data
+
+    mocker.patch("fetcher.client.fetch", side_effect=fake_fetch)
+
+    result = await client.fetch_posts([1, 2, 3], concurrency=1)
+
+    assert len(result) == 3
+    assert max_active == 1
+
+
+@pytest.mark.parametrize("bad_concurrency", [0, -1])
+@pytest.mark.asyncio
+async def test_fetch_posts_rejects_invalid_concurrency(bad_concurrency):
+    with pytest.raises(ValueError, match="concurrency must be >= 1"):
+        await asyncio.wait_for(
+            client.fetch_posts([1], concurrency=bad_concurrency),
+            timeout=0.1,
+        )

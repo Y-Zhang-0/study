@@ -23,6 +23,7 @@ dev = [
     "pytest-asyncio",
     "pytest-mock",
     "ruff",
+    "pytest-cov"
 ]
 
 # ====== 怎么把我打包安装(对照无……Node 不需要这层,后面讲为什么) ======
