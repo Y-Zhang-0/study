@@ -15,6 +15,7 @@
 | 2026-06-03 | D5 | 包管理(pyproject/venv/uv)+ 项目结构 | ai-study/phase1/fetcher/(uv+src 布局工程:pyproject + src/fetcher/{client,__init__} + tests/test_client.py;D4 代码与 11 测试迁入) | 🟡收口(**实跑 🟢**:11 测试全绿 + ruff clean;venv/pyproject/src 布局/`-e` 可编辑安装/`__all__` 全部亲手跑通、依赖隔离已验;**口头 2🟢2🔴**:patch 路径✅、锁文件分工✅,但 import 机制、src 布局动机两个"为什么"说不清)。当日大半时间耗在环境排障(uv 装不上→清华镜像、Anaconda 全局仓库不可写、注册表 PATH 误改后回退、stdlib 误当依赖、hatchling 包名不匹配),坑虽多但全是真知识 | 见薄弱点清单 |
 | 2026-06-04 | D6 | 实战:异步 CLI 工具(Click + asyncio) | ai-study/phase1/fetcher/src/fetcher/cli.py(fetch + batch 两子命令 + hello;Click group/option/argument + asyncio.run 整合 + ClickException + progressbar 内部 with + secho 彩色 + IntRange 校验) | 🟢收口(实跑🟢:ruff clean + fetch/batch 达标、失败隔离、分批限流、IntRange 防呆;口头🟢:晨考翻盘三硬骨头[GenericAlias/主语层级/双🔴]+ 收尾 3🟢;加餐进度条/彩色/校验全落地)。臣两处教学失误当场纠正(await↔for-in-progressbar 因果讲反、bar 传参绕弯) | 见薄弱点清单 |
 | 2026-06-17 | D7 | 实战:完整测试套件 + 工程化收尾 | ai-study/phase1/fetcher/(tests/test_cli.py + tests/test_client.py; retry + Semaphore 并发限制 + 非法 concurrency 防御; pytest 22 passed; coverage 90%; ruff clean) | 🟢收口(工程验证达标:单元+CLI 集成全绿、覆盖率>80%、基础重试/异常隔离/信号量限流/边界测试完成; v3.1 中指数退避+jitter、429/5xx/4xx 精细策略、README、资料精读与内功深挖不再阻塞 D7,滚入后续开发任务中穿插补齐) | side_effect 谁抛谁接仍需 D8 重考; v3.1 深挖项滚动补 |
+| 2026-06-22 | D8 | TypeScript 类型系统 + 工程心智补强 | ai-study/phase1/ts-study/(package.json + tsconfig.json + src/D8.ts; D8 主线、结构化类型、unknown/any、strict 可选字段、as vs satisfies 已合并) | 🟢收口(实跑🟢: npm run check + npm run build + node dist/D8.js 全过; 代码覆盖 interface/type、Pick/Omit/Partial/Record、泛型、类型擦除、结构化类型、unknown vs any、strict 可选字段、satisfies 配置校验; 教学流程经主公纠偏后固化“同构不同题”和转岗优先规则) | side_effect 谁抛谁接仍需 D9 再考; D9-D14 已落盘转岗强化细排 |
 
 ## 薄弱点滚动清单
 
@@ -136,9 +137,27 @@
 | v3.1 深挖 | 🟡 CliRunner 机制、覆盖率局限、pytest-asyncio event loop、幂等性、测试替身分类未系统完成 | 后续按改造方案滚动穿插 |
 | 学习节奏调整 | 🟢 主公要求弱化测试脚本编写、主攻开发 | D8 起任务分工调整 |
 
+### D8 收尾考核结果(2026-06-22):TS 主线 🟢 + 工程心智补强 🟢
+
+| 项目 | 结果 | 去向 |
+|:--|:--|:--|
+| 实跑验证 | 🟢 `npm run check`、`npm run build`、`node dist/D8.js` 均通过 | D8 工程收口 |
+| TS 基础建模 | 🟢 `interface Post`、`type` 派生、`Pick/Omit/Partial/Record`、泛型函数 `first`/`indexById` 完成 | 已完成 |
+| 编译期与运行时边界 | 🟢 主公能说清类型/泛型编译后消失，保留函数逻辑；TS 防静态类型错误，不自动兜底外部数据真假 | 已完成 |
+| 工程心智补强 | 🟢 结构化类型、`unknown` vs `any`、strict 可选字段、`as` vs `satisfies` 配置校验均落到 `src/D8.ts` | 已完成 |
+| 教学流程纠偏 | 🟢 已写入记忆修订：专业授课、转岗优先、示范“同构不同题”；后续任务文件中文说明 | 后续每日遵守 |
+| Python 滚动薄弱点 | 🟡 `side_effect` 三角色今日回炉未完全焊死 | D9 晨间继续重考 |
+| Week 2 计划 | 🟢 D9-D14 转岗强化细排已落盘并在 README/progress 登记 | 明天按该细排执行 |
+
 ## 每周复盘存档
 
 > 每周日完成 daily-schedule.md 文末「每周复盘 8 问」,链接归档于此。
 
 - [W1 D1-D7 复盘](weekly-reviews/W1-D1-D7-review.md) —— 2026-06-17 · 状态 生效
 
+
+## 近期执行计划调整
+
+| 日期 | 范围 | 状态 | 执行依据 | 说明 |
+|:--|:--|:--|:--|:--|
+| 2026-06-22 | D9-D14 | 生效 | [Phase 1 Week 2 转岗强化细排](./phase1-week2-career-adjustment.md) | 后续一周按转岗能力设计任务；时间只作负荷参考；D9 起围绕 React + TS SPA 连续演进 |
