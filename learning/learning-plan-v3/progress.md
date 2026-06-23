@@ -16,6 +16,7 @@
 | 2026-06-04 | D6 | 实战:异步 CLI 工具(Click + asyncio) | ai-study/phase1/fetcher/src/fetcher/cli.py(fetch + batch 两子命令 + hello;Click group/option/argument + asyncio.run 整合 + ClickException + progressbar 内部 with + secho 彩色 + IntRange 校验) | 🟢收口(实跑🟢:ruff clean + fetch/batch 达标、失败隔离、分批限流、IntRange 防呆;口头🟢:晨考翻盘三硬骨头[GenericAlias/主语层级/双🔴]+ 收尾 3🟢;加餐进度条/彩色/校验全落地)。臣两处教学失误当场纠正(await↔for-in-progressbar 因果讲反、bar 传参绕弯) | 见薄弱点清单 |
 | 2026-06-17 | D7 | 实战:完整测试套件 + 工程化收尾 | ai-study/phase1/fetcher/(tests/test_cli.py + tests/test_client.py; retry + Semaphore 并发限制 + 非法 concurrency 防御; pytest 22 passed; coverage 90%; ruff clean) | 🟢收口(工程验证达标:单元+CLI 集成全绿、覆盖率>80%、基础重试/异常隔离/信号量限流/边界测试完成; v3.1 中指数退避+jitter、429/5xx/4xx 精细策略、README、资料精读与内功深挖不再阻塞 D7,滚入后续开发任务中穿插补齐) | side_effect 谁抛谁接仍需 D8 重考; v3.1 深挖项滚动补 |
 | 2026-06-22 | D8 | TypeScript 类型系统 + 工程心智补强 | ai-study/phase1/ts-study/(package.json + tsconfig.json + src/D8.ts; D8 主线、结构化类型、unknown/any、strict 可选字段、as vs satisfies 已合并) | 🟢收口(实跑🟢: npm run check + npm run build + node dist/D8.js 全过; 代码覆盖 interface/type、Pick/Omit/Partial/Record、泛型、类型擦除、结构化类型、unknown vs any、strict 可选字段、satisfies 配置校验; 教学流程经主公纠偏后固化“同构不同题”和转岗优先规则) | side_effect 谁抛谁接仍需 D9 再考; D9-D14 已落盘转岗强化细排 |
+| 2026-06-23 | D9 | TS 进阶与运行时边界 + React 状态管理前置 | ai-study/phase1/ts-study/src/D9.ts(可辨识联合、unknown 类型守卫、交叉类型、never 穷尽检查、AsyncState<T>、Action + transition 状态迁移) | 🟢收口(实跑🟢: npm run check + npm run build + node dist/D9.js + 运行时探针均通过; 代码覆盖请求状态建模、parseTodos 外部脏数据过滤、TodoRecord 组合对象、refresh 保留旧 data 的状态迁移; 学习流程继续固化:任务卡需做转岗强度审查、示范代码低密度、门禁按场景分层) | side_effect 谁抛谁接晨考仍答反, D10 继续短问; D10 进入 React + TS 项目骨架 |
 
 ## 薄弱点滚动清单
 
@@ -146,8 +147,20 @@
 | 编译期与运行时边界 | 🟢 主公能说清类型/泛型编译后消失，保留函数逻辑；TS 防静态类型错误，不自动兜底外部数据真假 | 已完成 |
 | 工程心智补强 | 🟢 结构化类型、`unknown` vs `any`、strict 可选字段、`as` vs `satisfies` 配置校验均落到 `src/D8.ts` | 已完成 |
 | 教学流程纠偏 | 🟢 已写入记忆修订：专业授课、转岗优先、示范“同构不同题”；后续任务文件中文说明 | 后续每日遵守 |
-| Python 滚动薄弱点 | 🟡 `side_effect` 三角色今日回炉未完全焊死 | D9 晨间继续重考 |
+| Python 滚动薄弱点 | 🔴 D9 晨考仍把异常方向说反: mock 才按 side_effect 抛,被测代码负责接 | D10 晨间继续短问,只考三角色一句话 |
 | Week 2 计划 | 🟢 D9-D14 转岗强化细排已落盘并在 README/progress 登记 | 明天按该细排执行 |
+
+### D9 收尾考核结果(2026-06-23):TS 进阶 🟢 + React 状态管理前置 🟢
+
+| 项目 | 结果 | 去向 |
+|:--|:--|:--|
+| 实跑验证 | 🟢 `npm run check`、`npm run build`、`node dist/D9.js`、运行时探针均通过 | D9 工程收口 |
+| 请求状态建模 | 🟢 从具体 `State` 升级为 `AsyncState<T>`; `success/refreshing` 携带 data; `assertNever` 做穷尽检查 | D10 React state/useReducer 前置 |
+| 运行时边界 | 🟢 `unknown` + `isTodo` + `parseTodos` 能过滤接口脏数据; 主公能解释 `unknown` 与 `any` 风险差异 | 后续接接口/localStorage 时复用 |
+| 交叉类型 | 🟢 `TodoRecord = Todo & Timestamped & Owned`; 能解释结构类型系统允许大对象赋给小结构 | 已完成 |
+| 状态迁移 | 🟢 `Action<T>` + `transition` 完成; `refresh` 从旧 state 拿 data, success/refreshing 保留旧数据, idle 进入 loading | D10-D14 迁移到 React 状态管理 |
+| Python 滚动薄弱点 | 🔴 `side_effect` 三角色仍未焊死 | D10 晨间短问继续,标准句: mocker 安排, mock 抛,被测代码接 |
+| 教学流程纠偏 | 🟢 已写入记忆:门禁按场景分层、任务卡转岗强度审查、示范代码低密度、任务文件不内嵌完整示范 | D10 起任务卡按“今日必达/转岗强化/滚动补强”设计 |
 
 ## 每周复盘存档
 
