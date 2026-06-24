@@ -1,0 +1,80 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family:
+    Inter, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+  color: #1d2433;
+  background: #f4f7fb;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 32px 16px;
+}
+
+.workspace {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.workspace-header {
+  margin-bottom: 20px;
+}
+
+.workspace-header h1 {
+  margin: 4px 0 0;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #49627d;
+  font-size: 14px;
+}
+
+.todo-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.todo-form input {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #b8c4d3;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.todo-form button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  background: #2563eb;
+  cursor: pointer;
+}
+
+.todo-panel {
+  padding: 16px;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.empty-state {
+  margin: 0;
+  color: #64748b;
+}

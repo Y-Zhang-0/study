@@ -17,6 +17,7 @@
 | 2026-06-17 | D7 | 实战:完整测试套件 + 工程化收尾 | ai-study/phase1/fetcher/(tests/test_cli.py + tests/test_client.py; retry + Semaphore 并发限制 + 非法 concurrency 防御; pytest 22 passed; coverage 90%; ruff clean) | 🟢收口(工程验证达标:单元+CLI 集成全绿、覆盖率>80%、基础重试/异常隔离/信号量限流/边界测试完成; v3.1 中指数退避+jitter、429/5xx/4xx 精细策略、README、资料精读与内功深挖不再阻塞 D7,滚入后续开发任务中穿插补齐) | side_effect 谁抛谁接仍需 D8 重考; v3.1 深挖项滚动补 |
 | 2026-06-22 | D8 | TypeScript 类型系统 + 工程心智补强 | ai-study/phase1/ts-study/(package.json + tsconfig.json + src/D8.ts; D8 主线、结构化类型、unknown/any、strict 可选字段、as vs satisfies 已合并) | 🟢收口(实跑🟢: npm run check + npm run build + node dist/D8.js 全过; 代码覆盖 interface/type、Pick/Omit/Partial/Record、泛型、类型擦除、结构化类型、unknown vs any、strict 可选字段、satisfies 配置校验; 教学流程经主公纠偏后固化“同构不同题”和转岗优先规则) | side_effect 谁抛谁接仍需 D9 再考; D9-D14 已落盘转岗强化细排 |
 | 2026-06-23 | D9 | TS 进阶与运行时边界 + React 状态管理前置 | ai-study/phase1/ts-study/src/D9.ts(可辨识联合、unknown 类型守卫、交叉类型、never 穷尽检查、AsyncState<T>、Action + transition 状态迁移) | 🟢收口(实跑🟢: npm run check + npm run build + node dist/D9.js + 运行时探针均通过; 代码覆盖请求状态建模、parseTodos 外部脏数据过滤、TodoRecord 组合对象、refresh 保留旧 data 的状态迁移; 学习流程继续固化:任务卡需做转岗强度审查、示范代码低密度、门禁按场景分层) | side_effect 谁抛谁接晨考仍答反, D10 继续短问; D10 进入 React + TS 项目骨架 |
+| 2026-06-24 | D10 | React 核心与项目骨架 | ai-study/phase1/react-study/(Vite React TS 项目; TodoForm/TodoList/TodoFilter; 新增/删除/完成切换/筛选; FilterMode 类型化筛选; 派生 visibleTodos) | 🟢收口(实跑🟢: npm run typecheck + npm run build + 浏览器删除/toggle/筛选验证通过; 代码覆盖 JSX、props、state、事件、列表/条件渲染、单向数据流、不可变更新、函数式更新、派生数据、类型化 props) | side_effect 三角色已明显接近正确, D11 轻量复问即可; D11 进入 Hooks、副作用、localStorage 与陈旧闭包 |
 
 ## 薄弱点滚动清单
 
@@ -161,6 +162,18 @@
 | 状态迁移 | 🟢 `Action<T>` + `transition` 完成; `refresh` 从旧 state 拿 data, success/refreshing 保留旧数据, idle 进入 loading | D10-D14 迁移到 React 状态管理 |
 | Python 滚动薄弱点 | 🔴 `side_effect` 三角色仍未焊死 | D10 晨间短问继续,标准句: mocker 安排, mock 抛,被测代码接 |
 | 教学流程纠偏 | 🟢 已写入记忆:门禁按场景分层、任务卡转岗强度审查、示范代码低密度、任务文件不内嵌完整示范 | D10 起任务卡按“今日必达/转岗强化/滚动补强”设计 |
+
+### D10 收尾考核结果(2026-06-24):React 基础 🟢 + TS 组件类型 🟢
+
+| 项目 | 结果 | 去向 |
+|:--|:--|:--|
+| 实跑验证 | 🟢 npm run typecheck、npm run build、浏览器删除/toggle/筛选流程均通过 | D10 工程收口 |
+| React 核心 | 🟢 完成 JSX、函数组件、props、state、事件、表单提交、列表渲染、条件渲染、父子组件回调 | D11 接 Hooks 与副作用 |
+| 状态更新 | 🟢 新增/删除/完成切换均使用不可变更新; 列表更新改为 setTodos(prev => ...) 函数式更新 | 后续复杂状态继续沿用 |
+| 派生数据 | 🟢 filter 作为源状态; visibleTodos 由 todos + filter 计算,未重复存 state | D11-D13 继续防止派生状态重复存储 |
+| TS 组件类型 | 🟢 Todo 与 FilterMode 建模; TodoFilter props 从 string 收窄为 FilterMode | 后续表单/Hook props 继续类型先行 |
+| 教学流程纠偏 | 🟢 当日已确认:学习必须先对话授课,后续代码任务由用户创建和手写,文件不再做答案式填空 | D11 起严格执行 |
+| 滚动薄弱点 | 🟡 side_effect 三角色 D10 已答到 mock 抛、被测代码接; mocker 表述仍需从“构造请求”改为“布置 mock 对象” | D11 开课轻量复问 |
 
 ## 每周复盘存档
 
