@@ -27,6 +27,9 @@ htmlcov/
 # 本地 Claude 配置
 .claude/settings.local.json
 
+# 本地学习目录
+english-tutor-plan/
+
 # IDE
 .idea/
 .vscode/
