@@ -7,21 +7,27 @@ interface TodoFilterProps {
 
 export function TodoFilter({ filter, onFilterChange }: TodoFilterProps) {
   return (
-    <div>
+    <div className="todo-filter">
       <button
-        className={filter === "all" ? "active" : ""}
+        type="button"
+        className={`filter-button ${filter === "all" ? "is-active" : ""}`}
+        aria-pressed={filter === "all"}
         onClick={() => onFilterChange("all")}
       >
         全部
       </button>
       <button
-        className={filter === "completed" ? "active" : ""}
+        type="button"
+        className={`filter-button ${filter === "completed" ? "is-active" : ""}`}
+        aria-pressed={filter === "completed"}
         onClick={() => onFilterChange("completed")}
       >
         已完成
       </button>
       <button
-        className={filter === "active" ? "active" : ""}
+        type="button"
+        className={`filter-button ${filter === "active" ? "is-active" : ""}`}
+        aria-pressed={filter === "active"}
         onClick={() => onFilterChange("active")}
       >
         进行中

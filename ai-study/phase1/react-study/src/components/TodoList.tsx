@@ -13,10 +13,13 @@ export function TodoList({ todos, onDelete, onComplete }: TodoListProps) {
         <p className="empty-state">暂无数据</p>
       ) : (
         todos.map((todo) => (
-          <div key={todo.id} onClick={() => onComplete(todo.id)}>
-            <span>{todo.title}</span>
-            <span>{todo.completed ? "已完成" : "进行中"}</span>
+          <div className="todo-row" key={todo.id} onClick={() => onComplete(todo.id)}>
+            <span className="todo-title">{todo.title}</span>
+            <span className={`status-badge ${todo.completed ? "is-done" : "is-open"}`}>
+              {todo.completed ? "已完成" : "进行中"}
+            </span>
             <button
+              className="delete-button"
               onClick={(event) => {
                 event.stopPropagation();
                 onDelete(todo.id);

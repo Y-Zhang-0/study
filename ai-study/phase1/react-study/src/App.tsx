@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useState, useRef, useMemo, useEffect, type FormEvent } from "react";
 import { TodoForm } from "./components/TodoForm";
 import { TodoList } from "./components/TodoList";
 import { TodoFilter } from "./components/TodoFilter";
-import { initialTodos } from "./data";
 import type { FilterMode, Todo } from "./types";
+import { useLocalStorageTodos } from "./hooks/useLocalStorageTodos";
 
 function getVisibleTodos(todos: Todo[], filter: FilterMode): Todo[] {
   switch (filter) {
@@ -17,9 +17,10 @@ function getVisibleTodos(todos: Todo[], filter: FilterMode): Todo[] {
 }
 
 export default function App() {
-  const [todos, setTodos] = useState<Todo[]>(initialTodos);
+  const [todos, setTodos] = useLocalStorageTodos();
   const [draftTitle, setDraftTitle] = useState("");
   const [filter, setFilter] = useState<FilterMode>("all");
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -33,6 +34,7 @@ export default function App() {
       { id: Date.now(), title, completed: false },
     ]);
     setDraftTitle("");
+    inputRef.current?.focus();
   }
 
   function handleDelete(id: number): void {
@@ -50,17 +52,38 @@ export default function App() {
     );
   }
 
-  const visibleTodos = getVisibleTodos(todos, filter);
+  const visibleTodos = useMemo(
+    () => getVisibleTodos(todos, filter),
+    [todos, filter],
+  );
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent): void {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setDraftTitle("");
+      inputRef.current?.focus();
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <main className="app-shell">
       <section className="workspace">
         <header className="workspace-header">
-          <p className="eyebrow">D10 React + TypeScript</p>
+          <p className="eyebrow">D11 React + TypeScript</p>
           <h1>待办练习</h1>
         </header>
 
         <TodoForm
+          inputRef={inputRef}
           title={draftTitle}
           onTitleChange={setDraftTitle}
           onSubmit={handleSubmit}
